@@ -1,11 +1,12 @@
 import type { NextPage } from 'next';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import FullCalendar, { formatDate } from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { EventClickArg } from '@fullcalendar/common';
 import { DateSelectArg } from '@fullcalendar/core';
+import jaLocale from '@fullcalendar/core/locales/ja';
 
 /**
  * https://qiita.com/rpf-nob/items/466d5c8e0204146b2d6f
@@ -14,7 +15,7 @@ import { DateSelectArg } from '@fullcalendar/core';
  */
 
 const Index: NextPage = () => {
-  const [weekendsVisible, setWeekendsVisible] = useState<boolean>(true);
+  const [weekendsVisible, setWeekendsVisible] = useState(true);
   const [currentEvents, setCurrentEvents] = useState([]);
 
   const handleWeekendsToggle = (): void => {
@@ -49,18 +50,43 @@ const Index: NextPage = () => {
     }
   };
 
+  const calendarRef = useRef(null);
+
+  // const onClick = () => {
+  //   const api = calendarRef.current.getApi();
+  //   const type =
+  //     api.view.type === 'dayGridMonth' ? 'timeGridDay' : 'dayGridMonth';
+  //   const date = type === 'timeGridDay' ? '2017-06-01' : null;
+  //   api.changeView(type, date);
+  // };
+
   return (
     <div>
       <FullCalendar
+        locale={jaLocale}
+        ref={calendarRef}
+        dateClick={(value) => {
+          console.log('dateClick', value);
+        }}
+        // plugins={[timeGridPlugin, interactionPlugin]}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,myButton',
+        }}
+        customButtons={{
+          myButton: {
+            text: 'custom!',
+            click: function () {
+              alert('clicked the custom button!');
+            },
+          },
         }}
         initialView="dayGridMonth"
+        // initialView="dayGridMonth"
         editable={true}
-        selectable={true}
+        selectable={false}
         selectMirror={true}
         dayMaxEvents={true}
         select={handleDateSelect}
@@ -76,11 +102,12 @@ const Index: NextPage = () => {
           day: 'numeric',
         }}
         // eventsSet={handleEvents} // called after events are initialized/added/changed/removed
-        /* you can update a remote database when these fire:
-        eventAdd={function(){}}
-        eventChange={function(){}}
-        eventRemove={function(){}}
-        */
+        // /* you can update a remote database when these fire:
+        // eventAdd={function(){}}
+        eventChange={function (value) {
+          console.log('eventChange', value);
+        }}
+        // eventRemove={function(){}}
       />
     </div>
   );
