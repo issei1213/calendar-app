@@ -7,6 +7,12 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { EventClickArg } from '@fullcalendar/common';
 import { DateSelectArg } from '@fullcalendar/core';
 import jaLocale from '@fullcalendar/core/locales/ja';
+import { Event } from '@/types/firestore';
+import { collection, doc, onSnapshot, query } from 'firebase/firestore';
+import { db } from '@/repositories/repository';
+import dayjs from 'dayjs';
+import { RepositoryFactory } from '@/repositories/repositoryFactory';
+const eventRepository = RepositoryFactory.get('eventRepository');
 
 /**
  * https://qiita.com/rpf-nob/items/466d5c8e0204146b2d6f
@@ -17,6 +23,30 @@ import jaLocale from '@fullcalendar/core/locales/ja';
 const Index: NextPage = () => {
   const [weekendsVisible, setWeekendsVisible] = useState(true);
   const [currentEvents, setCurrentEvents] = useState([]);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    // const unsubscribe = () => {
+    //   eventRepository.onSnapshotGet();
+    // };
+
+    const unsubscribe = onSnapshot(
+      query(collection(db, 'calendars/K4u1P3lDe0AwJFNAJzV7/events')),
+      (snapshots) => {
+        setEvents(
+          snapshots.docs.map((item) => {
+            return {
+              title: item.data().title,
+              date: dayjs(item.data().date.toDate()).format('YYYY-MM-DD'),
+            };
+          }),
+        );
+      },
+    );
+
+    //remember to unsubscribe from your realtime listener on unmount or you will create a memory leak
+    return () => unsubscribe();
+  }, []);
 
   const handleWeekendsToggle = (): void => {
     setWeekendsVisible(!weekendsVisible);
@@ -90,11 +120,7 @@ const Index: NextPage = () => {
         selectMirror={true}
         dayMaxEvents={true}
         select={handleDateSelect}
-        initialEvents={[
-          { title: 'nice event', start: new Date() },
-          { title: 'event 1', date: '2021-01-29' },
-          { title: 'event 2', date: '2021-01-30' },
-        ]}
+        events={events}
         eventClick={handleEventClick}
         titleFormat={{
           year: 'numeric',
