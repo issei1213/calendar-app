@@ -1,4 +1,4 @@
-import type { NextPage } from 'next';
+import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import FullCalendar, { formatDate } from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -20,16 +20,35 @@ const eventRepository = RepositoryFactory.get('eventRepository');
  * https://fullcalendar.io/docs#toc
  */
 
-const Index: NextPage = () => {
+type Props = {
+  id: string;
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  };
+};
+
+export const getStaticProps: GetStaticProps<Props, { id: string }> = async (
+  context,
+) => {
+  try {
+    console.log('context', context);
+    return { props: { id: 'K4u1P3lDe0AwJFNAJzV7' } };
+  } catch (error) {
+    console.error(error);
+    return { notFound: true };
+  }
+};
+
+const CalendarIdMonth: NextPage = (props) => {
   const [weekendsVisible, setWeekendsVisible] = useState(true);
   const [currentEvents, setCurrentEvents] = useState([]);
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    // const unsubscribe = () => {
-    //   eventRepository.onSnapshotGet();
-    // };
-
     const unsubscribe = onSnapshot(
       query(collection(db, 'calendars/K4u1P3lDe0AwJFNAJzV7/events')),
       (snapshots) => {
@@ -139,4 +158,4 @@ const Index: NextPage = () => {
   );
 };
 
-export default Index;
+export default CalendarIdMonth;
