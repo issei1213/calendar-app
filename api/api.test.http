@@ -1,0 +1,5 @@
+#GET http://localhost:3000/calendars
+GET https://asia-northeast1-calendar-app-25928.cloudfunctions.net/api/calendars
+Accept: application/json
+
+###
