@@ -1,5 +1,11 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+  PropsWithChildren,
+} from 'react';
 import FullCalendar, { formatDate } from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -12,7 +18,7 @@ import { collection, doc, onSnapshot, query } from 'firebase/firestore';
 import { db } from '@/repositories/repository';
 import dayjs from 'dayjs';
 import { RepositoryFactory } from '@/repositories/repositoryFactory';
-const eventRepository = RepositoryFactory.get('eventRepository');
+const calendarRepository = RepositoryFactory.get('calendar');
 
 /**
  * https://qiita.com/rpf-nob/items/466d5c8e0204146b2d6f
@@ -35,22 +41,30 @@ export const getStaticProps: GetStaticProps<Props, { id: string }> = async (
   context,
 ) => {
   try {
-    console.log('context', context);
-    return { props: { id: 'K4u1P3lDe0AwJFNAJzV7' } };
+    const allDocIdResult = await calendarRepository.getAllDocId();
+    const { data, status } = allDocIdResult;
+    if (status !== 200) throw Error('Request Error');
+
+    const findDocId = data.find(
+      (value: string) => value === context?.params?.id,
+    );
+    if (!findDocId) throw Error('Document is Error');
+
+    return { props: { id: findDocId } };
   } catch (error) {
     console.error(error);
     return { notFound: true };
   }
 };
 
-const CalendarIdMonth: NextPage = (props) => {
+const CalendarIdMonth: NextPage<Props> = ({ id }) => {
   const [weekendsVisible, setWeekendsVisible] = useState(true);
   const [currentEvents, setCurrentEvents] = useState([]);
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      query(collection(db, 'calendars/K4u1P3lDe0AwJFNAJzV7/events')),
+      query(collection(db, `calendars/${id}/events`)),
       (snapshots) => {
         setEvents(
           snapshots.docs.map((item) => {

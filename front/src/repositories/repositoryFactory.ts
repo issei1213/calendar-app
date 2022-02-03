@@ -1,11 +1,11 @@
-import eventRepository from '@/repositories/eventRepository';
+import CalendarRepository from '@/repositories/calendarRepository';
 
-type Repositories = 'eventRepository';
+type RepositoriesType = 'calendar';
 
 const repositories = {
-  eventRepository: eventRepository,
+  calendar: CalendarRepository,
 };
 
 export const RepositoryFactory = {
-  get: (name: Repositories) => repositories[name],
+  get: (name: RepositoriesType) => repositories[name],
 };
