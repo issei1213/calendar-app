@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { CalendarsController } from './calendars/calendars.controller';
 import { CalendarsService } from './calendars/calendars.service';
 import { CalendarsModule } from './calendars/calendars.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
-  imports: [CalendarsModule],
+  imports: [CalendarsModule, EventsModule],
   controllers: [],
   providers: [],
 })

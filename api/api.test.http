@@ -1,5 +1,28 @@
+POST http://localhost:3000/calendars/GDw8lVYykSdMZlATNwVJ/events
+Content-Type: application/json
+
+{
+  "title": "",
+  "startDate": "2022-02-04T15:10:22.837Z",
+  "endDate": "2022-02-04T15:10:22.837Z"
+}
+
+###
+
+###
+# calendarコレクション作成
+POST http://localhost:3000/calendars
+#POST https://asia-northeast1-calendar-app-25928.cloudfunctions.net/api/calendars
+Content-Type: application/json
+
+{}
+
+###
+
+# calendarドキュメントID取得
 #GET http://localhost:3000/calendars
 GET https://asia-northeast1-calendar-app-25928.cloudfunctions.net/api/calendars
 Accept: application/json
 
 ###
+
